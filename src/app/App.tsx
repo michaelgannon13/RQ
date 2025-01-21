@@ -2,7 +2,7 @@ import React from 'react';
 import { createUseStyles } from 'react-jss';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { LayoutProvider } from '../contexts';
-import { Nav } from '../components';
+import { Nav, Spinner } from '../components';
 import { ApolloProvider } from '@apollo/client';
 import { client } from './client';
 import { ListPage, Home } from '../screens';
@@ -17,11 +17,13 @@ function App() {
             <Nav />
             <div className={classes.content}>
               <div className={classes.scrollableArea}>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/pokemon" element={<ListPage />} />
-                  <Route path="/pokemon/:id" element={<ListPage />} />
-                </Routes>
+                <React.Suspense fallback={<Spinner />}>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/pokemon" element={<ListPage />} />
+                    <Route path="/pokemon/:id" element={<ListPage />} />
+                  </Routes>
+                </React.Suspense>
               </div>
             </div>
           </BrowserRouter>
