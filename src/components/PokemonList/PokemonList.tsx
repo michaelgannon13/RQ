@@ -4,28 +4,7 @@ import { createUseStyles } from 'react-jss';
 import { useGetPokemons } from '../../hooks/useGetPokemons';
 import { PokemonDialog } from '../PokemonDialog/PokemonDialog';
 import { Spinner } from '../Spinner';
-import { Pokemon } from '../../types/pokemon';
-
-const TYPE_COLORS: { [key: string]: string } = {
-  Grass: '#78C850',
-  Fire: '#F08030',
-  Water: '#6890F0',
-  Bug: '#A8B820',
-  Normal: '#A8A878',
-  Poison: '#A040A0',
-  Electric: '#F8D030',
-  Ground: '#E0C068',
-  Fairy: '#EE99AC',
-  Fighting: '#C03028',
-  Psychic: '#F85888',
-  Rock: '#B8A038',
-  Ghost: '#705898',
-  Ice: '#98D8D8',
-  Dragon: '#7038F8',
-  Flying: '#A890F0',
-  Steel: '#B8B8D0',
-  Dark: '#705848',
-};
+import { Pokemon, getTypeColor } from '../../types/pokemon';
 
 export const PokemonList = () => {
   const classes = useStyles();
@@ -76,6 +55,10 @@ export const PokemonList = () => {
   const handleCloseDialog = () => {
     navigate('/pokemon');
   };
+
+  const getTypeBadgeStyle = (type: string) => ({
+    backgroundColor: getTypeColor(type),
+  });
 
   if (loading) return <Spinner />;
   if (error) return <div>Error loading Pokémon</div>;
@@ -143,7 +126,7 @@ export const PokemonList = () => {
                     <span
                       key={type}
                       className={classes.type}
-                      style={{ backgroundColor: TYPE_COLORS[type] || '#777' }}
+                      style={getTypeBadgeStyle(type)}
                     >
                       {type}
                     </span>

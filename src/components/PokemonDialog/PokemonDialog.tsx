@@ -2,27 +2,7 @@ import React from 'react';
 import { createUseStyles } from 'react-jss';
 import { useGetPokemonDetails } from '../../hooks/useGetPokemonDetails';
 import { PokemonDialogProps } from '../../types/components';
-
-const TYPE_COLORS: { [key: string]: string } = {
-  Grass: '#78C850',
-  Fire: '#F08030',
-  Water: '#6890F0',
-  Bug: '#A8B820',
-  Normal: '#A8A878',
-  Poison: '#A040A0',
-  Electric: '#F8D030',
-  Ground: '#E0C068',
-  Fairy: '#EE99AC',
-  Fighting: '#C03028',
-  Psychic: '#F85888',
-  Rock: '#B8A038',
-  Ghost: '#705898',
-  Ice: '#98D8D8',
-  Dragon: '#7038F8',
-  Flying: '#A890F0',
-  Steel: '#B8B8D0',
-  Dark: '#705848',
-};
+import { getTypeColor } from '../../types/pokemon';
 
 export const PokemonDialog: React.FC<PokemonDialogProps> = ({
   pokemonNumber: pokemonId,
@@ -33,6 +13,10 @@ export const PokemonDialog: React.FC<PokemonDialogProps> = ({
   const { pokemon, loading } = useGetPokemonDetails(pokemonId);
 
   if (!open) return null;
+
+  const getTypeBadgeStyle = (type: string) => ({
+    backgroundColor: getTypeColor(type),
+  });
 
   return (
     <div className={classes.overlay} onClick={onClose}>
@@ -56,11 +40,11 @@ export const PokemonDialog: React.FC<PokemonDialogProps> = ({
                 <div className={classes.number}>#{pokemon.number}</div>
                 <h2 className={classes.name}>{pokemon.name}</h2>
                 <div className={classes.types}>
-                  {pokemon.types.map((type: string) => (
+                  {pokemon.types.map((type) => (
                     <span
                       key={type}
                       className={classes.type}
-                      style={{ backgroundColor: TYPE_COLORS[type] || '#777' }}
+                      style={getTypeBadgeStyle(type)}
                     >
                       {type}
                     </span>
@@ -85,7 +69,7 @@ export const PokemonDialog: React.FC<PokemonDialogProps> = ({
                         <span
                           key={type}
                           className={classes.type}
-                          style={{ backgroundColor: TYPE_COLORS[type] || '#777' }}
+                          style={getTypeBadgeStyle(type)}
                         >
                           {type}
                         </span>
@@ -99,7 +83,7 @@ export const PokemonDialog: React.FC<PokemonDialogProps> = ({
                         <span
                           key={type}
                           className={classes.type}
-                          style={{ backgroundColor: TYPE_COLORS[type] || '#777' }}
+                          style={getTypeBadgeStyle(type)}
                         >
                           {type}
                         </span>
@@ -192,9 +176,10 @@ const useStyles = createUseStyles({
   type: {
     padding: '4px 12px',
     borderRadius: '16px',
-    fontSize: '0.9rem',
+    fontSize: '0.8rem',
     color: 'white',
     fontWeight: 'bold',
+    textShadow: '1px 1px 2px rgba(0,0,0,0.2)',
   },
   details: {
     marginTop: '16px',
