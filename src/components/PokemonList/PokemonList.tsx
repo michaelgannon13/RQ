@@ -32,6 +32,7 @@ export const PokemonList = () => {
   const { pokemons, loading } = useGetPokemons();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPokemon, setSelectedPokemon] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState('number');
 
   useEffect(() => {
     if (id) {
@@ -47,6 +48,23 @@ export const PokemonList = () => {
       type.toLowerCase().includes(searchTerm.toLowerCase())
     );
     return matchesName || matchesType;
+  });
+
+  const sortedPokemons = [...filteredPokemons].sort((a, b) => {
+    switch (sortBy) {
+      case 'number':
+        return parseInt(a.number) - parseInt(b.number);
+      case 'name':
+        return a.name.localeCompare(b.name);
+      case 'type':
+        return a.types[0].localeCompare(b.types[0]);
+      case 'typeCount':
+        return b.types.length - a.types.length;
+      case 'nameLength':
+        return a.name.length - b.name.length;
+      default:
+        return 0;
+    }
   });
 
   const handlePokemonClick = (pokemonId: string) => {
@@ -67,10 +85,21 @@ export const PokemonList = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className={classes.searchInput}
         />
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          className={classes.sortSelect}
+        >
+          <option value="number">Sort by Number</option>
+          <option value="name">Sort by Name (A-Z)</option>
+          <option value="type">Sort by Primary Type</option>
+          <option value="typeCount">Sort by Number of Types</option>
+          <option value="nameLength">Sort by Name Length</option>
+        </select>
       </div>
       {loading && <div className={classes.loading}>Loading...</div>}
       <div className={classes.grid} data-testid="pokemon-grid">
-        {filteredPokemons.map((pokemon) => (
+        {sortedPokemons.map((pokemon) => (
           <div 
             key={pokemon.id} 
             className={classes.card}
@@ -206,6 +235,8 @@ const useStyles = createUseStyles(
       marginBottom: '24px',
       display: 'flex',
       justifyContent: 'center',
+      gap: '16px',
+      flexWrap: 'wrap',
     },
     searchInput: {
       padding: '12px 20px',
@@ -217,6 +248,20 @@ const useStyles = createUseStyles(
       maxWidth: '400px',
       outline: 'none',
       transition: 'border-color 0.2s ease',
+      '&:focus': {
+        borderColor: '#6890F0',
+      },
+    },
+    sortSelect: {
+      padding: '12px 20px',
+      fontSize: '1rem',
+      borderRadius: '24px',
+      color: '#333',
+      border: '2px solid #ddd',
+      outline: 'none',
+      transition: 'border-color 0.2s ease',
+      cursor: 'pointer',
+      backgroundColor: 'white',
       '&:focus': {
         borderColor: '#6890F0',
       },
