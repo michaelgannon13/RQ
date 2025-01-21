@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import { useGetPokemons } from '../../hooks/useGetPokemons';
 
@@ -26,12 +26,30 @@ const TYPE_COLORS: { [key: string]: string } = {
 export const PokemonList = () => {
   const classes = useStyles();
   const { pokemons, loading } = useGetPokemons();
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredPokemons = pokemons.filter((pokemon) => {
+    const matchesName = pokemon.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = pokemon.types.some(type => 
+      type.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    return matchesName || matchesType;
+  });
 
   return (
     <div className={classes.root}>
+      <div className={classes.searchContainer}>
+        <input
+          type="text"
+          placeholder="Search by name or type..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className={classes.searchInput}
+        />
+      </div>
       {loading && <div className={classes.loading}>Loading...</div>}
       <div className={classes.grid} data-testid="pokemon-grid">
-        {pokemons.map((pokemon) => (
+        {filteredPokemons.map((pokemon) => (
           <div key={pokemon.id} className={classes.card}>
             <div className={classes.imageContainer}>
               <img
@@ -150,6 +168,25 @@ const useStyles = createUseStyles(
       color: 'white',
       fontWeight: 'bold',
       textShadow: '1px 1px 2px rgba(0,0,0,0.2)',
+    },
+    searchContainer: {
+      marginBottom: '24px',
+      display: 'flex',
+      justifyContent: 'center',
+    },
+    searchInput: {
+      padding: '12px 20px',
+      fontSize: '1rem',
+      borderRadius: '24px',
+      color: 'black',
+      border: '2px solid #ddd',
+      width: '100%',
+      maxWidth: '400px',
+      outline: 'none',
+      transition: 'border-color 0.2s ease',
+      '&:focus': {
+        borderColor: '#6890F0',
+      },
     },
   },
   { name: 'PokemonList' }
