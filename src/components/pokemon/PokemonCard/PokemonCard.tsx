@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { createUseStyles } from 'react-jss';
 import { Pokemon, getTypeColor } from '../../../types/pokemon';
 
@@ -17,10 +17,14 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
     backgroundColor: getTypeColor(type),
   });
 
+  const handleClick = useCallback(() => {
+    onClick(pokemon.id);
+  }, [pokemon.id, onClick]);
+
   return (
     <div 
       className={classes.card}
-      onClick={() => onClick(pokemon.id)}
+      onClick={handleClick}
       role="button"
       tabIndex={0}
     >

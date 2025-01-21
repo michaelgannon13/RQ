@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { createUseStyles } from 'react-jss';
 import { Pokemon } from '../../../types/pokemon';
 import { PokemonCard } from '../PokemonCard/PokemonCard';
@@ -8,7 +8,7 @@ interface PokemonGridProps {
   onPokemonClick: (id: string) => void;
 }
 
-export const PokemonGrid: React.FC<PokemonGridProps> = ({
+export const PokemonGrid = memo<PokemonGridProps>(({
   pokemons,
   onPokemonClick,
 }) => {
@@ -25,7 +25,7 @@ export const PokemonGrid: React.FC<PokemonGridProps> = ({
       ))}
     </div>
   );
-};
+});
 
 const useStyles = createUseStyles({
   grid: {

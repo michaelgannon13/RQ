@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { createUseStyles } from 'react-jss';
 import { useGetPokemons } from '../../hooks/useGetPokemons';
@@ -36,30 +36,34 @@ export const PokemonList = () => {
     }
   }, [id]);
 
-  const filteredPokemons = pokemons.filter((pokemon: Pokemon) => {
-    const matchesName = pokemon.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = pokemon.types.some(type => 
-      type.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    return matchesName || matchesType;
-  });
+  const filteredPokemons = useMemo(() => {
+    return pokemons.filter((pokemon: Pokemon) => {
+      const matchesName = pokemon.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesType = pokemon.types.some(type => 
+        type.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      return matchesName || matchesType;
+    });
+  }, [pokemons, searchTerm]);
 
-  const sortedPokemons = [...filteredPokemons].sort((a: Pokemon, b: Pokemon) => {
-    switch (sortBy) {
-      case 'number':
-        return parseInt(a.number) - parseInt(b.number);
-      case 'name':
-        return a.name.localeCompare(b.name);
-      case 'type':
-        return a.types[0].localeCompare(b.types[0]);
-      case 'typeCount':
-        return b.types.length - a.types.length;
-      case 'nameLength':
-        return a.name.length - b.name.length;
-      default:
-        return 0;
-    }
-  });
+  const sortedPokemons = useMemo(() => {
+    return [...filteredPokemons].sort((a: Pokemon, b: Pokemon) => {
+      switch (sortBy) {
+        case 'number':
+          return parseInt(a.number) - parseInt(b.number);
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'type':
+          return a.types[0].localeCompare(b.types[0]);
+        case 'typeCount':
+          return b.types.length - a.types.length;
+        case 'nameLength':
+          return a.name.length - b.name.length;
+        default:
+          return 0;
+      }
+    });
+  }, [filteredPokemons, sortBy]);
 
   const handlePokemonClick = (pokemonId: string) => {
     navigate(`/pokemon/${pokemonId}`);
