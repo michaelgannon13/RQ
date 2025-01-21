@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { createUseStyles } from 'react-jss';
 import { useGetPokemons } from '../../hooks/useGetPokemons';
 import { PokemonDialog } from '../PokemonDialog/PokemonDialog';
+import { Spinner } from '../Spinner';
 
 const TYPE_COLORS: { [key: string]: string } = {
   Grass: '#78C850',
@@ -97,41 +98,46 @@ export const PokemonList = () => {
           <option value="nameLength">Sort by Name Length</option>
         </select>
       </div>
-      {loading && <div className={classes.loading}>Loading...</div>}
-      <div className={classes.grid} data-testid="pokemon-grid">
-        {sortedPokemons.map((pokemon) => (
-          <div 
-            key={pokemon.id} 
-            className={classes.card}
-            onClick={() => handlePokemonClick(pokemon.id)}
-            role="button"
-            tabIndex={0}
-          >
-            <div className={classes.imageContainer}>
-              <img
-                src={pokemon.image}
-                alt={pokemon.name}
-                className={classes.image}
-              />
-            </div>
-            <div className={classes.info}>
-              <div className={classes.number}>#{pokemon.number}</div>
-              <h3 className={classes.name}>{pokemon.name}</h3>
-              <div className={classes.types}>
-                {pokemon.types.map((type) => (
-                  <span
-                    key={type}
-                    className={classes.type}
-                    style={{ backgroundColor: TYPE_COLORS[type] || '#777' }}
-                  >
-                    {type}
-                  </span>
-                ))}
+      {loading ? (
+        <div className={classes.spinnerContainer}>
+          <Spinner />
+        </div>
+      ) : (
+        <div className={classes.grid} data-testid="pokemon-grid">
+          {sortedPokemons.map((pokemon) => (
+            <div 
+              key={pokemon.id} 
+              className={classes.card}
+              onClick={() => handlePokemonClick(pokemon.id)}
+              role="button"
+              tabIndex={0}
+            >
+              <div className={classes.imageContainer}>
+                <img
+                  src={pokemon.image}
+                  alt={pokemon.name}
+                  className={classes.image}
+                />
+              </div>
+              <div className={classes.info}>
+                <div className={classes.number}>#{pokemon.number}</div>
+                <h3 className={classes.name}>{pokemon.name}</h3>
+                <div className={classes.types}>
+                  {pokemon.types.map((type) => (
+                    <span
+                      key={type}
+                      className={classes.type}
+                      style={{ backgroundColor: TYPE_COLORS[type] || '#777' }}
+                    >
+                      {type}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       <PokemonDialog
         pokemonNumber={selectedPokemon}
@@ -149,10 +155,11 @@ const useStyles = createUseStyles(
       padding: '32px',
       boxSizing: 'border-box',
     },
-    loading: {
-      textAlign: 'center',
-      fontSize: '1.2rem',
-      padding: '2rem',
+    spinnerContainer: {
+      height: '400px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     grid: {
       display: 'grid',
