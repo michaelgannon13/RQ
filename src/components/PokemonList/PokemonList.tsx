@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { createUseStyles } from 'react-jss';
 import { useGetPokemons } from '../../hooks/useGetPokemons';
+import { useGetPokemonDetails } from '../../hooks/useGetPokemonDetails';
 import { PokemonDialog } from '../PokemonDialog/PokemonDialog';
 import { Spinner } from '../Spinner';
+import { Pokemon } from '../../types';
 
 const TYPE_COLORS: { [key: string]: string } = {
   Grass: '#78C850',
@@ -31,15 +33,19 @@ export const PokemonList = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { pokemons, loading } = useGetPokemons();
+  const [selectedPokemonId, setSelectedPokemonId] = useState<string | null>(null);
+  const { pokemon: selectedPokemonDetails } = useGetPokemonDetails(selectedPokemonId);
+  const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedPokemon, setSelectedPokemon] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState('number');
 
   useEffect(() => {
     if (id) {
-      setSelectedPokemon(id);
+      setSelectedPokemonId(id);
+      setOpen(true);
     } else {
-      setSelectedPokemon(null);
+      setSelectedPokemonId(null);
+      setOpen(false);
     }
   }, [id]);
 
@@ -68,11 +74,11 @@ export const PokemonList = () => {
     }
   });
 
-  const handlePokemonClick = (pokemonId: string) => {
-    navigate(`/pokemon/${pokemonId}`);
+  const handlePokemonClick = (pokemon: Pokemon) => {
+    navigate(`/pokemon/${pokemon.id}`);
   };
 
-  const handleCloseDialog = () => {
+  const handleClose = () => {
     navigate('/pokemon');
   };
 
@@ -120,7 +126,7 @@ export const PokemonList = () => {
             <div 
               key={pokemon.id} 
               className={classes.card}
-              onClick={() => handlePokemonClick(pokemon.id)}
+              onClick={() => handlePokemonClick(pokemon)}
               role="button"
               tabIndex={0}
             >
@@ -151,10 +157,10 @@ export const PokemonList = () => {
         </div>
       )}
 
-      <PokemonDialog
-        pokemonNumber={selectedPokemon}
-        open={selectedPokemon !== null}
-        onClose={handleCloseDialog}
+      <PokemonDialog 
+        open={open}
+        pokemon={selectedPokemonDetails || null}
+        onClose={handleClose}
       />
     </div>
   );
