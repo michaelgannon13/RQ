@@ -102,6 +102,18 @@ export const PokemonList = () => {
         <div className={classes.spinnerContainer}>
           <Spinner />
         </div>
+      ) : sortedPokemons.length === 0 ? (
+        <div className={classes.noResults}>
+          <img 
+            src="https://static1.srcdn.com/wordpress/wp-content/uploads/2022/09/Sad-Pikachu.jpg?q=50&fit=crop&w=1140&h=&dpr=1.5" 
+            alt="Sad Pikachu"
+            className={classes.sadPikachu}
+          />
+          <div className={classes.noResultsMessage}>
+            <h3>Oh no! No Pokémon found...</h3>
+            <p>Even Pikachu couldn't find any matches for "{searchTerm}"</p>
+          </div>
+        </div>
       ) : (
         <div className={classes.grid} data-testid="pokemon-grid">
           {sortedPokemons.map((pokemon) => (
@@ -175,16 +187,46 @@ const useStyles = createUseStyles(
       borderRadius: '12px',
       padding: '16px',
       boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-      transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
       cursor: 'pointer',
       width: '100%',
       maxWidth: '250px',
       height: '350px',
       display: 'flex',
       flexDirection: 'column',
+      position: 'relative',
+      isolation: 'isolate',
+      transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        inset: '-2px',
+        background: 'linear-gradient(45deg, #ff0000, #cc0000, #ffffff, #cc0000, #ff0000)',
+        borderRadius: '14px',
+        opacity: 0,
+        transition: 'opacity 0.3s ease-in-out',
+        zIndex: -2,
+      },
+      '&::after': {
+        content: '""',
+        position: 'absolute',
+        inset: '0',
+        background: 'white',
+        borderRadius: '12px',
+        zIndex: -1,
+      },
       '&:hover': {
-        transform: 'translateY(-5px)',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+        transform: 'translateY(-5px) scale(1.02)',
+        boxShadow: '0 8px 25px rgba(0,0,0,0.2)',
+        '&::before': {
+          opacity: 1,
+          animation: '$borderRotate 3s linear infinite',
+        },
+        '& $imageContainer': {
+          '&::before': {
+            transform: 'translate(-50%, -50%) scale(1)',
+            opacity: 0.1,
+          },
+        },
       },
     },
     imageContainer: {
@@ -196,6 +238,21 @@ const useStyles = createUseStyles(
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
+      position: 'relative',
+      overflow: 'hidden',
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        width: '300px',
+        height: '300px',
+        background: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23FF0000'/%3E%3Cpath d='M5 50h90' stroke='white' stroke-width='10'/%3E%3Ccircle cx='50' cy='50' r='15' fill='white' stroke='%23333' stroke-width='4'/%3E%3C/svg%3E") center/contain no-repeat`,
+        transform: 'translate(-50%, -50%) scale(0)',
+        opacity: 0,
+        transition: 'transform 0.3s ease-out, opacity 0.3s ease-out',
+        pointerEvents: 'none',
+      },
     },
     image: {
       width: 'auto',
@@ -271,6 +328,49 @@ const useStyles = createUseStyles(
       backgroundColor: 'white',
       '&:focus': {
         borderColor: '#6890F0',
+      },
+    },
+    '@keyframes borderRotate': {
+      '0%': {
+        filter: 'hue-rotate(0deg)',
+      },
+      '100%': {
+        filter: 'hue-rotate(360deg)',
+      },
+    },
+    noResults: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '48px 20px',
+      textAlign: 'center',
+      minHeight: '400px',
+      gap: '24px',
+    },
+    sadPikachu: {
+      height: '200px',
+      filter: 'grayscale(0.5) opacity(0.8)',
+      animation: '$bounce 2s infinite ease-in-out',
+    },
+    noResultsMessage: {
+      color: '#fff',
+      '& h3': {
+        fontSize: '1.5rem',
+        marginBottom: '8px',
+        color: '#fff',
+      },
+      '& p': {
+        fontSize: '1.1rem',
+        margin: 0,
+      },
+    },
+    '@keyframes bounce': {
+      '0%, 100%': {
+        transform: 'translateY(0)',
+      },
+      '50%': {
+        transform: 'translateY(-10px)',
       },
     },
   },
