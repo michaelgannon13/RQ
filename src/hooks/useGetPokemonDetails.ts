@@ -1,4 +1,5 @@
 import { useQuery, gql } from '@apollo/client';
+import { PokemonDetails } from '../types/pokemon';
 
 const GET_POKEMON_DETAILS = gql`
   query pokemon($id: String, $name: String) {
@@ -24,7 +25,7 @@ const GET_POKEMON_DETAILS = gql`
 `;
 
 export const useGetPokemonDetails = (pokemonNumber: string | null) => {
-  const { data, loading, error } = useQuery(GET_POKEMON_DETAILS, {
+  const { data, loading, error } = useQuery<{ pokemon: PokemonDetails }>(GET_POKEMON_DETAILS, {
     variables: { id: pokemonNumber },
     skip: !pokemonNumber,
   });

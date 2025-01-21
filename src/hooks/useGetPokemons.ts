@@ -1,19 +1,7 @@
 import { useMemo } from 'react';
 import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
-
-export type Pokemon = {
-  id: string;
-  name: string;
-  number: string;
-  types: string[];
-  image: string;
-};
-
-export type PokemonOption = {
-  value: Pokemon['id'];
-  label: Pokemon['name'];
-};
+import { Pokemon, PokemonOption } from '../types/pokemon';
 
 export const GET_POKEMONS = gql`
   query pokemons($first: Int!) {
@@ -30,7 +18,7 @@ export const GET_POKEMONS = gql`
 export const useGetPokemons = () => {
   const { data, ...queryRes } = useQuery(GET_POKEMONS, {
     variables: {
-      first: 151, // Keep hard coded
+      first: 151,
     },
   });
 

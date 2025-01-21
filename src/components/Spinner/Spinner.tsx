@@ -1,8 +1,9 @@
 import React from 'react';
 import { createUseStyles } from 'react-jss';
+import { SpinnerProps } from '../../types/components';
 
-const Spinner: React.FC = () => {
-  const classes = useStyles();
+const Spinner: React.FC<SpinnerProps> = ({ size = 60 }) => {
+  const classes = useStyles({ size });
   return (
     <div className={classes.spinner}>
       <div className={classes.pokeball}></div>
@@ -18,9 +19,9 @@ const useStyles = createUseStyles({
     height: '100%',
     width: '100%',
   },
-  pokeball: {
-    width: '60px',
-    height: '60px',
+  pokeball: ({ size = 60 }: SpinnerProps) => ({
+    width: `${size}px`,
+    height: `${size}px`,
     backgroundColor: '#f00',
     borderRadius: '50%',
     position: 'relative',
@@ -28,17 +29,17 @@ const useStyles = createUseStyles({
     '&::before': {
       content: '""',
       position: 'absolute',
-      width: '60px',
-      height: '30px',
+      width: '100%',
+      height: '50%',
       backgroundColor: '#fff',
-      borderRadius: '0 0 30px 30px',
+      borderRadius: `0 0 ${size/2}px ${size/2}px`,
       bottom: 0,
     },
     '&::after': {
       content: '""',
       position: 'absolute',
-      width: '20px',
-      height: '20px',
+      width: `${size/3}px`,
+      height: `${size/3}px`,
       backgroundColor: '#fff',
       borderRadius: '50%',
       top: '50%',
@@ -46,7 +47,7 @@ const useStyles = createUseStyles({
       transform: 'translate(-50%, -50%)',
       border: '4px solid #333',
     }
-  },
+  }),
   '@keyframes spin': {
     from: { transform: 'rotate(0deg)' },
     to: { transform: 'rotate(360deg)' }
