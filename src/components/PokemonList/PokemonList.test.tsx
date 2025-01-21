@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { PokemonList } from './PokemonList';
 import { useGetPokemons } from '../../hooks/useGetPokemons';
 
@@ -81,5 +81,70 @@ describe('PokemonList', () => {
 
     expect(grassBadge).toHaveStyle({ backgroundColor: '#78C850' });
     expect(poisonBadge).toHaveStyle({ backgroundColor: '#A040A0' });
+  });
+
+  describe('Search functionality', () => {
+    beforeEach(() => {
+      mockUseGetPokemons.mockReturnValue({
+        pokemons: mockPokemons,
+        pokemonOptions: [],
+        loading: false,
+      });
+    });
+
+    it('renders the search input', () => {
+      render(<PokemonList />);
+      expect(screen.getByPlaceholderText('Search by name or type...')).toBeInTheDocument();
+    });
+
+    it('filters pokemon by name', () => {
+      render(<PokemonList />);
+      const searchInput = screen.getByPlaceholderText('Search by name or type...');
+      
+      fireEvent.change(searchInput, { target: { value: 'bulba' } });
+      
+      expect(screen.getByText('Bulbasaur')).toBeInTheDocument();
+      expect(screen.queryByText('Pikachu')).not.toBeInTheDocument();
+    });
+
+    it('filters pokemon by type', () => {
+      render(<PokemonList />);
+      const searchInput = screen.getByPlaceholderText('Search by name or type...');
+      
+      fireEvent.change(searchInput, { target: { value: 'Electric' } });
+      
+      expect(screen.queryByText('Bulbasaur')).not.toBeInTheDocument();
+      expect(screen.getByText('Pikachu')).toBeInTheDocument();
+    });
+
+    it('is case insensitive when filtering', () => {
+      render(<PokemonList />);
+      const searchInput = screen.getByPlaceholderText('Search by name or type...');
+      
+      fireEvent.change(searchInput, { target: { value: 'grass' } });
+      
+      expect(screen.getByText('Bulbasaur')).toBeInTheDocument();
+    });
+
+    it('shows all pokemon when search is empty', () => {
+      render(<PokemonList />);
+      const searchInput = screen.getByPlaceholderText('Search by name or type...');
+      
+      fireEvent.change(searchInput, { target: { value: 'bulba' } });
+      fireEvent.change(searchInput, { target: { value: '' } });
+      
+      expect(screen.getByText('Bulbasaur')).toBeInTheDocument();
+      expect(screen.getByText('Pikachu')).toBeInTheDocument();
+    });
+
+    it('shows no results when search has no matches', () => {
+      render(<PokemonList />);
+      const searchInput = screen.getByPlaceholderText('Search by name or type...');
+      
+      fireEvent.change(searchInput, { target: { value: 'xyz123' } });
+      
+      expect(screen.queryByText('Bulbasaur')).not.toBeInTheDocument();
+      expect(screen.queryByText('Pikachu')).not.toBeInTheDocument();
+    });
   });
 }); 
