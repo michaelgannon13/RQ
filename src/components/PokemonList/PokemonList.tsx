@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import { useGetPokemons } from '../../hooks/useGetPokemons';
+import { PokemonDialog } from '../PokemonDialog/PokemonDialog';
 
 const TYPE_COLORS: { [key: string]: string } = {
   Grass: '#78C850',
@@ -27,6 +28,7 @@ export const PokemonList = () => {
   const classes = useStyles();
   const { pokemons, loading } = useGetPokemons();
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedPokemon, setSelectedPokemon] = useState<string | null>(null);
 
   const filteredPokemons = pokemons.filter((pokemon) => {
     const matchesName = pokemon.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -35,6 +37,14 @@ export const PokemonList = () => {
     );
     return matchesName || matchesType;
   });
+
+  const handlePokemonClick = (pokemonId: string) => {
+    setSelectedPokemon(pokemonId);
+  };
+
+  const handleCloseDialog = () => {
+    setSelectedPokemon(null);
+  };
 
   return (
     <div className={classes.root}>
@@ -50,7 +60,13 @@ export const PokemonList = () => {
       {loading && <div className={classes.loading}>Loading...</div>}
       <div className={classes.grid} data-testid="pokemon-grid">
         {filteredPokemons.map((pokemon) => (
-          <div key={pokemon.id} className={classes.card}>
+          <div 
+            key={pokemon.id} 
+            className={classes.card}
+            onClick={() => handlePokemonClick(pokemon.id)}
+            role="button"
+            tabIndex={0}
+          >
             <div className={classes.imageContainer}>
               <img
                 src={pokemon.image}
@@ -76,6 +92,12 @@ export const PokemonList = () => {
           </div>
         ))}
       </div>
+
+      <PokemonDialog
+        pokemonNumber={selectedPokemon}
+        open={selectedPokemon !== null}
+        onClose={handleCloseDialog}
+      />
     </div>
   );
 };

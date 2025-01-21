@@ -19,7 +19,9 @@ function App() {
               <div className={classes.scrollableArea}>
                 <Routes>
                   <Route path="/" element={<Home />} />
-                  <Route path="/pokemon" element={<ListPage />} />
+                  <Route path="/pokemon" element={<ListPage />}>
+                    <Route path=":id" element={<ListPage />} />
+                  </Route>
                 </Routes>
               </div>
             </div>
