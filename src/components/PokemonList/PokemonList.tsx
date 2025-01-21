@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { createUseStyles } from 'react-jss';
 import { useGetPokemons } from '../../hooks/useGetPokemons';
 import { PokemonDialog } from '../PokemonDialog/PokemonDialog';
@@ -26,9 +27,19 @@ const TYPE_COLORS: { [key: string]: string } = {
 
 export const PokemonList = () => {
   const classes = useStyles();
+  const navigate = useNavigate();
+  const { id } = useParams();
   const { pokemons, loading } = useGetPokemons();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPokemon, setSelectedPokemon] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (id) {
+      setSelectedPokemon(id);
+    } else {
+      setSelectedPokemon(null);
+    }
+  }, [id]);
 
   const filteredPokemons = pokemons.filter((pokemon) => {
     const matchesName = pokemon.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -39,11 +50,11 @@ export const PokemonList = () => {
   });
 
   const handlePokemonClick = (pokemonId: string) => {
-    setSelectedPokemon(pokemonId);
+    navigate(`/pokemon/${pokemonId}`);
   };
 
   const handleCloseDialog = () => {
-    setSelectedPokemon(null);
+    navigate('/pokemon');
   };
 
   return (
