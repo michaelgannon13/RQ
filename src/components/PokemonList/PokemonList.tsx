@@ -4,6 +4,7 @@ import { createUseStyles } from 'react-jss';
 import { useGetPokemons } from '../../hooks/useGetPokemons';
 import { PokemonDialog } from '../PokemonDialog/PokemonDialog';
 import { Spinner } from '../Spinner';
+import { Pokemon } from '../../types/pokemon';
 
 const TYPE_COLORS: { [key: string]: string } = {
   Grass: '#78C850',
@@ -30,7 +31,7 @@ export const PokemonList = () => {
   const classes = useStyles();
   const navigate = useNavigate();
   const { id } = useParams();
-  const { pokemons, loading } = useGetPokemons();
+  const { pokemons, loading, error } = useGetPokemons();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPokemon, setSelectedPokemon] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState('number');
@@ -43,7 +44,7 @@ export const PokemonList = () => {
     }
   }, [id]);
 
-  const filteredPokemons = pokemons.filter((pokemon) => {
+  const filteredPokemons = pokemons.filter((pokemon: Pokemon) => {
     const matchesName = pokemon.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = pokemon.types.some(type => 
       type.toLowerCase().includes(searchTerm.toLowerCase())
@@ -51,7 +52,7 @@ export const PokemonList = () => {
     return matchesName || matchesType;
   });
 
-  const sortedPokemons = [...filteredPokemons].sort((a, b) => {
+  const sortedPokemons = [...filteredPokemons].sort((a: Pokemon, b: Pokemon) => {
     switch (sortBy) {
       case 'number':
         return parseInt(a.number) - parseInt(b.number);
@@ -75,6 +76,9 @@ export const PokemonList = () => {
   const handleCloseDialog = () => {
     navigate('/pokemon');
   };
+
+  if (loading) return <Spinner />;
+  if (error) return <div>Error loading Pokémon</div>;
 
   return (
     <div className={classes.root}>
@@ -116,7 +120,7 @@ export const PokemonList = () => {
         </div>
       ) : (
         <div className={classes.grid} data-testid="pokemon-grid">
-          {sortedPokemons.map((pokemon) => (
+          {sortedPokemons.map((pokemon: Pokemon) => (
             <div 
               key={pokemon.id} 
               className={classes.card}

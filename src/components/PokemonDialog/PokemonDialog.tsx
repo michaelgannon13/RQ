@@ -1,6 +1,7 @@
 import React from 'react';
 import { createUseStyles } from 'react-jss';
 import { useGetPokemonDetails } from '../../hooks/useGetPokemonDetails';
+import { PokemonDialogProps } from '../../types/components';
 
 const TYPE_COLORS: { [key: string]: string } = {
   Grass: '#78C850',
@@ -22,12 +23,6 @@ const TYPE_COLORS: { [key: string]: string } = {
   Steel: '#B8B8D0',
   Dark: '#705848',
 };
-
-interface PokemonDialogProps {
-  pokemonNumber: string | null;
-  open: boolean;
-  onClose: () => void;
-}
 
 export const PokemonDialog: React.FC<PokemonDialogProps> = ({
   pokemonNumber: pokemonId,
