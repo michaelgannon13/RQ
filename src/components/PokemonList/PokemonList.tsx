@@ -49,6 +49,7 @@ export const PokemonList = () => {
       <PokemonGrid 
         pokemons={filteredAndSortedPokemons}
         onPokemonClick={handlePokemonClick}
+        searchTerm={searchTerm}
       />
 
       <PokemonDialog
