@@ -6,6 +6,7 @@ import { TypeBadge } from '../../pokemon/TypeBadge/TypeBadge';
 interface PokemonCardProps {
   pokemon: Pokemon;
   onClick: (id: string) => void;
+  highlight?: string;
 }
 
 export const PokemonCard = memo<PokemonCardProps>(({
