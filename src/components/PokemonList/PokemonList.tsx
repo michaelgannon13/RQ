@@ -19,23 +19,7 @@ const SORT_OPTIONS = [
   { value: 'nameLength', label: 'Sort by Name Length' },
 ];
 
-export const PokemonList = () => {
-  const classes = useStyles();
-  const navigate = useNavigate();
-  const { id } = useParams();
-  const { pokemons, loading, error } = useGetPokemons();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedPokemon, setSelectedPokemon] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState('number');
-
-  useEffect(() => {
-    if (id) {
-      setSelectedPokemon(id);
-    } else {
-      setSelectedPokemon(null);
-    }
-  }, [id]);
-
+function usePokemonFiltering(pokemons: Pokemon[], searchTerm: string, sortBy: string) {
   const filteredPokemons = useMemo(() => {
     return pokemons.filter((pokemon: Pokemon) => {
       const matchesName = pokemon.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -64,6 +48,28 @@ export const PokemonList = () => {
       }
     });
   }, [filteredPokemons, sortBy]);
+
+  return sortedPokemons;
+}
+
+export const PokemonList = () => {
+  const classes = useStyles();
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const { pokemons, loading, error } = useGetPokemons();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedPokemon, setSelectedPokemon] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState('number');
+
+  useEffect(() => {
+    if (id) {
+      setSelectedPokemon(id);
+    } else {
+      setSelectedPokemon(null);
+    }
+  }, [id]);
+
+  const sortedPokemons = usePokemonFiltering(pokemons, searchTerm, sortBy);
 
   const handlePokemonClick = (pokemonId: string) => {
     navigate(`/pokemon/${pokemonId}`);
