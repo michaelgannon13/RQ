@@ -1,8 +1,36 @@
-import React from 'react';
-import { createUseStyles } from 'react-jss';
+import React, { useState } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Box,
+  Typography,
+  styled,
+  Fade,
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close'
 import { useGetPokemonDetails } from '../../hooks/useGetPokemonDetails';
 import { PokemonDialogProps } from '../../types/components';
 import { getTypeColor } from '../../types/pokemon';
+import Spinner from '../Spinner/Spinner';
+import { createUseStyles } from 'react-jss';
+
+const TypeBadge = styled('span')<{ backgroundColor: string }>(({ backgroundColor }) => ({
+  padding: '4px 12px',
+  borderRadius: '16px',
+  fontSize: '0.8rem',
+  color: 'white',
+  fontWeight: 'bold',
+  textShadow: '1px 1px 2px rgba(0,0,0,0.2)',
+  backgroundColor,
+}));
+
+const useStyles = createUseStyles({
+  closeIcon: {
+    color: '#000000'
+  }
+});
 
 export const PokemonDialog: React.FC<PokemonDialogProps> = ({
   pokemonNumber: pokemonId,
@@ -11,215 +39,158 @@ export const PokemonDialog: React.FC<PokemonDialogProps> = ({
 }) => {
   const classes = useStyles();
   const { pokemon, loading } = useGetPokemonDetails(pokemonId);
+  const [contentReady, setContentReady] = useState(false);
 
-  if (!open) return null;
-
-  const getTypeBadgeStyle = (type: string) => ({
-    backgroundColor: getTypeColor(type),
-  });
+  React.useEffect(() => {
+    if (open) {
+      setContentReady(false);
+      const timer = setTimeout(() => {
+        setContentReady(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [open, pokemonId]);
 
   return (
-    <div className={classes.overlay} onClick={onClose} data-testid="pokemon-dialog-overlay">
-      <div className={classes.dialog} onClick={(e) => e.stopPropagation()} data-testid="pokemon-dialog-content">
-        {loading ? (
-          <div className={classes.loading}>Loading...</div>
-        ) : pokemon ? (
-          <>
-            <button className={classes.closeButton} onClick={onClose}>
-              × 
-            </button>
-            <div className={classes.content}>
-              <div className={classes.imageContainer}>
-                <img
-                  src={pokemon.image}
-                  alt={pokemon.name}
-                  className={classes.image}
-                />
-              </div>
-              <div className={classes.info}>
-                <div className={classes.number}>#{pokemon.number}</div>
-                <h2 className={classes.name}>{pokemon.name}</h2>
-                <div className={classes.types}>
-                  {pokemon.types.map((type) => (
-                    <span
-                      key={type}
-                      className={classes.type}
-                      style={getTypeBadgeStyle(type)}
-                    >
-                      {type}
-                    </span>
-                  ))}
-                </div>
-                <div className={classes.details}>
-                  <div className={classes.stat}>
-                    <span>Height:</span> {pokemon.height.minimum} - {pokemon.height.maximum}
-                  </div>
-                  <div className={classes.stat}>
-                    <span>Weight:</span> {pokemon.weight.minimum} - {pokemon.weight.maximum}
-                  </div>
-                  <div className={classes.stat}>
-                    <span>Classification:</span> {pokemon.classification}
-                  </div>
-                </div>
-                <div className={classes.attributes}>
-                  <div className={classes.attributeSection}>
-                    <h3>Weaknesses</h3>
-                    <div className={classes.typeList}>
-                      {pokemon.weaknesses.map((type: string) => (
-                        <span
-                          key={type}
-                          className={classes.type}
-                          style={getTypeBadgeStyle(type)}
-                        >
-                          {type}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className={classes.attributeSection}>
-                    <h3>Resistances</h3>
-                    <div className={classes.typeList}>
-                      {pokemon.resistant.map((type: string) => (
-                        <span
-                          key={type}
-                          className={classes.type}
-                          style={getTypeBadgeStyle(type)}
-                        >
-                          {type}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </>
-        ) : (
-          <div className={classes.error}>Pokemon not found</div>
-        )}
-      </div>
-    </div>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      data-testid="pokemon-dialog-content"
+      TransitionProps={{
+        onExited: () => setContentReady(false),
+      }}
+    >
+      {(!contentReady || loading) ? (
+        <DialogContent>
+          <Box 
+            sx={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              alignItems: 'center', 
+              minHeight: '400px',
+              flexDirection: 'column',
+              gap: 2
+            }}
+          >
+            <Spinner size={80} />
+            <Typography>Loading Pokémon details...</Typography>
+          </Box>
+        </DialogContent>
+      ) : pokemon ? (
+        <Fade in={contentReady} timeout={300}>
+          <div>
+            <DialogTitle sx={{ m: 0, p: 2, textAlign: 'center' }}>
+              <IconButton
+                aria-label="close"
+                onClick={onClose}
+                sx={{
+                  position: 'absolute',
+                  right: 8,
+                  top: 8
+                }}
+              >
+                <CloseIcon className={classes.closeIcon} />
+              </IconButton>
+            </DialogTitle>
+            <DialogContent>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <Box sx={{ 
+                  background: '#f5f5f5',
+                  borderRadius: 1,
+                  padding: 2,
+                  display: 'flex',
+                  justifyContent: 'center'
+                }}>
+                  <img
+                    src={pokemon.image}
+                    alt={pokemon.name}
+                    style={{ maxWidth: '200px', height: 'auto' }}
+                  />
+                </Box>
+                
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography color="text.secondary" variant="h6">
+                    #{pokemon.number}
+                  </Typography>
+                  <Typography variant="h4" sx={{ 
+                    my: 1,
+                    textTransform: 'capitalize',
+                    color: '#333'
+                  }}>
+                    {pokemon.name}
+                  </Typography>
+                  
+                  <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', mb: 2 }}>
+                    {pokemon.types.map((type) => (
+                      <TypeBadge
+                        key={type}
+                        backgroundColor={getTypeColor(type)}
+                      >
+                        {type}
+                      </TypeBadge>
+                    ))}
+                  </Box>
+
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <Typography>
+                      <strong>Height:</strong> {pokemon.height.minimum} - {pokemon.height.maximum}
+                    </Typography>
+                    <Typography>
+                      <strong>Weight:</strong> {pokemon.weight.minimum} - {pokemon.weight.maximum}
+                    </Typography>
+                    <Typography>
+                      <strong>Classification:</strong> {pokemon.classification}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Box>
+                      <Typography variant="h6" gutterBottom>
+                        Weaknesses
+                      </Typography>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
+                        {pokemon.weaknesses.map((type) => (
+                          <TypeBadge
+                            key={type}
+                            backgroundColor={getTypeColor(type)}
+                          >
+                            {type}
+                          </TypeBadge>
+                        ))}
+                      </Box>
+                    </Box>
+                    
+                    <Box>
+                      <Typography variant="h6" gutterBottom>
+                        Resistances
+                      </Typography>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
+                        {pokemon.resistant.map((type) => (
+                          <TypeBadge
+                            key={type}
+                            backgroundColor={getTypeColor(type)}
+                          >
+                            {type}
+                          </TypeBadge>
+                        ))}
+                      </Box>
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
+            </DialogContent>
+          </div>
+        </Fade>
+      ) : (
+        <DialogContent>
+          <Box sx={{ textAlign: 'center', padding: '24px', color: 'error.main' }}>
+            Pokemon not found
+          </Box>
+        </DialogContent>
+      )}
+    </Dialog>
   );
 };
-
-const useStyles = createUseStyles({
-  overlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1000,
-  },
-  dialog: {
-    backgroundColor: 'white',
-    borderRadius: '12px',
-    padding: '24px',
-    maxWidth: '600px',
-    width: '90%',
-    maxHeight: '90vh',
-    overflow: 'auto',
-    position: 'relative',
-  },
-  closeButton: {
-    position: 'absolute',
-    top: '12px',
-    right: '12px',
-    border: 'none',
-    background: 'none',
-    fontSize: '24px',
-    cursor: 'pointer',
-    color: '#666',
-    '&:hover': {
-      color: '#333',
-    },
-  },
-  content: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '24px',
-  },
-  imageContainer: {
-    background: '#f5f5f5',
-    borderRadius: '8px',
-    padding: '16px',
-    display: 'flex',
-    justifyContent: 'center',
-  },
-  image: {
-    maxWidth: '200px',
-    height: 'auto',
-  },
-  info: {
-    textAlign: 'center',
-  },
-  number: {
-    color: '#666',
-    fontSize: '1.1rem',
-  },
-  name: {
-    margin: '8px 0',
-    fontSize: '2rem',
-    color: '#333',
-    textTransform: 'capitalize',
-  },
-  types: {
-    display: 'flex',
-    gap: '8px',
-    justifyContent: 'center',
-    marginBottom: '16px',
-  },
-  type: {
-    padding: '4px 12px',
-    borderRadius: '16px',
-    fontSize: '0.8rem',
-    color: 'white',
-    fontWeight: 'bold',
-    textShadow: '1px 1px 2px rgba(0,0,0,0.2)',
-  },
-  details: {
-    marginTop: '16px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-  },
-  stat: {
-    '& span': {
-      fontWeight: 'bold',
-      marginRight: '8px',
-    },
-  },
-  attributes: {
-    marginTop: '24px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '16px',
-  },
-  attributeSection: {
-    '& h3': {
-      margin: '0 0 8px 0',
-      fontSize: '1.1rem',
-      color: '#333',
-    },
-  },
-  typeList: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '8px',
-    justifyContent: 'center',
-  },
-  loading: {
-    textAlign: 'center',
-    padding: '24px',
-    fontSize: '1.2rem',
-  },
-  error: {
-    textAlign: 'center',
-    padding: '24px',
-    color: 'red',
-  },
-}); 
