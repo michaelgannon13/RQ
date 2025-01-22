@@ -17,7 +17,7 @@ export const Home = () => {
 
   return (
     <div className={classes.root}>
-      {/* <ReactMarkdown>{markdown}</ReactMarkdown> */}
+      <ReactMarkdown>{markdown}</ReactMarkdown>
     </div>
   );
 };

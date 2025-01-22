@@ -2,15 +2,20 @@ import { useMemo } from 'react';
 import { Pokemon } from '../types/pokemon';
 
 export const usePokemonFiltering = (pokemons: Pokemon[], searchTerm: string, sortBy: string) => {
+  const normalizedSearchTerm = useMemo(() => 
+    searchTerm.toLowerCase().trim(),
+    [searchTerm]
+  );
+
   const filteredPokemons = useMemo(() => {
     return pokemons.filter((pokemon: Pokemon) => {
-      const matchesName = pokemon.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesName = pokemon.name.toLowerCase().includes(normalizedSearchTerm);
       const matchesType = pokemon.types.some(type => 
-        type.toLowerCase().includes(searchTerm.toLowerCase())
+        type.toLowerCase().includes(normalizedSearchTerm)
       );
       return matchesName || matchesType;
     });
-  }, [pokemons, searchTerm]);
+  }, [pokemons, normalizedSearchTerm]);
 
   const sortedPokemons = useMemo(() => {
     return [...filteredPokemons].sort((a: Pokemon, b: Pokemon) => {

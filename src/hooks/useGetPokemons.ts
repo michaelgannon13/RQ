@@ -16,11 +16,15 @@ export const GET_POKEMONS = gql`
 `;
 
 export const useGetPokemons = () => {
-  const { data, ...queryRes } = useQuery(GET_POKEMONS, {
+  const { data, error, loading, ...queryRes } = useQuery(GET_POKEMONS, {
     variables: {
       first: 151,
     },
   });
+
+  if (error) {
+    console.error('Error fetching Pokemon:', error);
+  }
 
   const pokemons: Pokemon[] = useMemo(() => data?.pokemons || [], [data]);
 
@@ -32,6 +36,8 @@ export const useGetPokemons = () => {
   return {
     pokemons,
     pokemonOptions,
+    loading,
+    error,
     ...queryRes,
   };
 };

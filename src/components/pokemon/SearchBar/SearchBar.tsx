@@ -21,16 +21,22 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   const classes = useStyles();
   
   return (
-    <div className={classes.container}>
+    <div 
+      className={classes.container}
+      role="search"
+      aria-label="Search Pokemon"
+    >
       <SearchInput
         value={searchTerm}
         onChange={onSearchChange}
         placeholder="Search by name or type..."
+        aria-label="Search Pokemon by name or type"
       />
       <Select
         value={sortBy}
         onChange={onSortChange}
         options={sortOptions}
+        aria-label="Sort Pokemon list"
       />
     </div>
   );
