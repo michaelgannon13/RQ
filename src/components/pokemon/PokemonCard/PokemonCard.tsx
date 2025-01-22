@@ -1,34 +1,45 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { createUseStyles } from 'react-jss';
-import { Pokemon, getTypeColor } from '../../../types/pokemon';
+import { Pokemon } from '../../../types/pokemon';
+import { TypeBadge } from '../../pokemon/TypeBadge/TypeBadge';
 
 interface PokemonCardProps {
   pokemon: Pokemon;
   onClick: (id: string) => void;
 }
 
-export const PokemonCard: React.FC<PokemonCardProps> = ({
+export const PokemonCard = memo<PokemonCardProps>(({
   pokemon,
   onClick,
 }) => {
   const classes = useStyles();
 
-  const getTypeBadgeStyle = (type: string) => ({
-    backgroundColor: getTypeColor(type),
-  });
+  const handleClick = () => {
+    onClick(pokemon.id);
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onClick(pokemon.id);
+    }
+  };
 
   return (
     <div 
       className={classes.card}
-      onClick={() => onClick(pokemon.id)}
+      onClick={handleClick}
+      onKeyPress={handleKeyPress}
       role="button"
       tabIndex={0}
+      aria-label={`Pokemon ${pokemon.name}, number ${pokemon.number}`}
     >
       <div className={classes.imageContainer}>
         <img
           src={pokemon.image}
           alt={pokemon.name}
           className={classes.image}
+          loading="lazy"
         />
       </div>
       <div className={classes.info}>
@@ -36,19 +47,15 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
         <h3 className={classes.name}>{pokemon.name}</h3>
         <div className={classes.types}>
           {pokemon.types.map((type) => (
-            <span
-              key={type}
-              className={classes.type}
-              style={getTypeBadgeStyle(type)}
-            >
-              {type}
-            </span>
+            <TypeBadge key={type} type={type} />
           ))}
         </div>
       </div>
     </div>
   );
-};
+});
+
+PokemonCard.displayName = 'PokemonCard';
 
 const useStyles = createUseStyles({
   card: {
@@ -68,6 +75,10 @@ const useStyles = createUseStyles({
     '&:hover': {
       transform: 'translateY(-5px) scale(1.02)',
       boxShadow: '0 8px 25px rgba(0,0,0,0.2)',
+    },
+    '&:focus': {
+      outline: '2px solid #6890F0',
+      outlineOffset: '2px',
     }
   },
   imageContainer: {
@@ -109,12 +120,4 @@ const useStyles = createUseStyles({
     justifyContent: 'center',
     flexWrap: 'wrap',
   },
-  type: {
-    padding: '4px 12px',
-    borderRadius: '16px',
-    fontSize: '0.8rem',
-    color: 'white',
-    fontWeight: 'bold',
-    textShadow: '1px 1px 2px rgba(0,0,0,0.2)',
-  }
 }, { name: 'PokemonCard' }); 
