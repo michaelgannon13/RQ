@@ -5,7 +5,7 @@ import { SpinnerProps } from '../../types/components';
 const Spinner: React.FC<SpinnerProps> = ({ size = 60 }) => {
   const classes = useStyles({ size });
   return (
-    <div className={classes.spinner}>
+    <div className={classes.spinner} data-testid="spinner">
       <div className={classes.pokeball}></div>
     </div>
   );

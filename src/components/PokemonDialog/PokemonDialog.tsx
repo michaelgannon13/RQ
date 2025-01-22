@@ -19,8 +19,8 @@ export const PokemonDialog: React.FC<PokemonDialogProps> = ({
   });
 
   return (
-    <div className={classes.overlay} onClick={onClose}>
-      <div className={classes.dialog} onClick={(e) => e.stopPropagation()}>
+    <div className={classes.overlay} onClick={onClose} data-testid="pokemon-dialog-overlay">
+      <div className={classes.dialog} onClick={(e) => e.stopPropagation()} data-testid="pokemon-dialog-content">
         {loading ? (
           <div className={classes.loading}>Loading...</div>
         ) : pokemon ? (

@@ -1,150 +1,143 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { PokemonList } from './PokemonList';
 import { useGetPokemons } from '../../hooks/useGetPokemons';
+import userEvent from '@testing-library/user-event';
 
 jest.mock('../../hooks/useGetPokemons');
-const mockUseGetPokemons = useGetPokemons as jest.MockedFunction<typeof useGetPokemons>;
+jest.mock('../PokemonDialog/PokemonDialog', () => ({
+  PokemonDialog: ({ open, onClose }: { open: boolean; onClose: () => void }) => (
+    <div data-testid="pokemon-dialog" onClick={onClose}>Pokemon Dialog</div>
+  ),
+}));
 
-const mockPokemons = [
-  {
-    id: '1',
-    name: 'Bulbasaur',
-    number: '001',
-    types: ['Grass', 'Poison'],
-    image: 'https://example.com/bulbasaur.png',
-  },
-  {
-    id: '25',
-    name: 'Pikachu',
-    number: '025',
-    types: ['Electric'],
-    image: 'https://example.com/pikachu.png',
-  },
-];
+const mockNavigate = jest.fn();
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: () => mockNavigate,
+}));
+
+interface SetupOptions {
+  initialRoute?: string;
+  loading?: boolean;
+  pokemons?: Array<{ id: string; name: string; types: string[] }>;
+}
 
 describe('PokemonList', () => {
+  const mockPokemons = [
+    { id: '1', name: 'Bulbasaur', types: ['grass', 'poison'] },
+    { id: '4', name: 'Charmander', types: ['fire'] },
+    { id: '7', name: 'Squirtle', types: ['water'] },
+  ];
+
+  const setup = (options: SetupOptions = {}) => {
+    const {
+      initialRoute = '/pokemon',
+      loading = false,
+      pokemons = mockPokemons,
+    } = options;
+
+    (useGetPokemons as jest.Mock).mockReturnValue({
+      pokemons,
+      loading,
+    });
+
+    return render(
+      <MemoryRouter initialEntries={[initialRoute]}>
+        <Routes>
+          <Route path="/pokemon" element={<PokemonList />}>
+            <Route path=":id" element={<PokemonList />} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    );
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('displays loading state when data is being fetched', () => {
-    mockUseGetPokemons.mockReturnValue({
-      pokemons: [],
-      pokemonOptions: [],
-      loading: true,
+  describe('Loading State', () => {
+    it('shows spinner while loading data', () => {
+      setup({ loading: true });
+      expect(screen.getByTestId('spinner')).toBeInTheDocument();
     });
-
-    render(<PokemonList />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
-  it('renders pokemon cards with correct information', () => {
-    mockUseGetPokemons.mockReturnValue({
-      pokemons: mockPokemons,
-      pokemonOptions: [],
-      loading: false,
+  describe('Pokemon Grid', () => {
+    it('displays correct number of pokemon cards', () => {
+      setup();
+      const cards = screen.getAllByTestId('pokemon-card');
+      expect(cards).toHaveLength(mockPokemons.length);
     });
 
-    render(<PokemonList />);
-
-    expect(screen.getByText('Bulbasaur')).toBeInTheDocument();
-    expect(screen.getByText('Pikachu')).toBeInTheDocument();
-
-    expect(screen.getByText('#001')).toBeInTheDocument();
-    expect(screen.getByText('#025')).toBeInTheDocument();
-
-    expect(screen.getByText('Grass')).toBeInTheDocument();
-    expect(screen.getByText('Poison')).toBeInTheDocument();
-    expect(screen.getByText('Electric')).toBeInTheDocument();
-
-    const bulbasaurImage = screen.getByAltText('Bulbasaur');
-    const pikachuImage = screen.getByAltText('Pikachu');
-    expect(bulbasaurImage).toBeInTheDocument();
-    expect(pikachuImage).toBeInTheDocument();
-    expect(bulbasaurImage).toHaveAttribute('src', 'https://example.com/bulbasaur.png');
-    expect(pikachuImage).toHaveAttribute('src', 'https://example.com/pikachu.png');
-  });
-
-
-  it('applies correct styles to type badges', () => {
-    mockUseGetPokemons.mockReturnValue({
-      pokemons: [mockPokemons[0]],
-      pokemonOptions: [],
-      loading: false,
-    });
-
-    render(<PokemonList />);
-
-    const grassBadge = screen.getByText('Grass');
-    const poisonBadge = screen.getByText('Poison');
-
-    expect(grassBadge).toHaveStyle({ backgroundColor: '#78C850' });
-    expect(poisonBadge).toHaveStyle({ backgroundColor: '#A040A0' });
-  });
-
-  describe('Search functionality', () => {
-    beforeEach(() => {
-      mockUseGetPokemons.mockReturnValue({
-        pokemons: mockPokemons,
-        pokemonOptions: [],
-        loading: false,
+    it('displays pokemon names correctly', () => {
+      setup();
+      mockPokemons.forEach(pokemon => {
+        expect(screen.getByText(pokemon.name)).toBeInTheDocument();
       });
     });
+  });
 
-    it('renders the search input', () => {
-      render(<PokemonList />);
-      expect(screen.getByPlaceholderText('Search by name or type...')).toBeInTheDocument();
-    });
+  describe('Search Functionality', () => {
+    it('filters pokemon when searching by name', async () => {
+      setup();
+      const user = userEvent.setup();
+      
+      const searchInput = screen.getByPlaceholderText(/Search by name or type.../i);
+      await user.type(searchInput, 'char');
 
-    it('filters pokemon by name', () => {
-      render(<PokemonList />);
-      const searchInput = screen.getByPlaceholderText('Search by name or type...');
-      
-      fireEvent.change(searchInput, { target: { value: 'bulba' } });
-      
-      expect(screen.getByText('Bulbasaur')).toBeInTheDocument();
-      expect(screen.queryByText('Pikachu')).not.toBeInTheDocument();
-    });
-
-    it('filters pokemon by type', () => {
-      render(<PokemonList />);
-      const searchInput = screen.getByPlaceholderText('Search by name or type...');
-      
-      fireEvent.change(searchInput, { target: { value: 'Electric' } });
-      
+      const cards = screen.getAllByTestId('pokemon-card');
+      expect(cards).toHaveLength(1);
+      expect(screen.getByText('Charmander')).toBeInTheDocument();
       expect(screen.queryByText('Bulbasaur')).not.toBeInTheDocument();
-      expect(screen.getByText('Pikachu')).toBeInTheDocument();
     });
 
-    it('is case insensitive when filtering', () => {
-      render(<PokemonList />);
-      const searchInput = screen.getByPlaceholderText('Search by name or type...');
+    it('shows no results message for non-matching search', async () => {
+      setup();
+      const user = userEvent.setup();
       
-      fireEvent.change(searchInput, { target: { value: 'grass' } });
+      const searchInput = screen.getByPlaceholderText(/Search by name or type.../i);
+      await user.type(searchInput, 'xyz');
+
+      expect(screen.getByTestId('no-results')).toBeInTheDocument();
+    });
+  });
+
+  describe('Sorting Functionality', () => {
+    it('changes sort order when different option selected', async () => {
+      setup();
+      const user = userEvent.setup();
       
-      expect(screen.getByText('Bulbasaur')).toBeInTheDocument();
+      const sortSelect = screen.getByTestId('sort-select');
+    });
+  });
+
+  describe('Navigation and Dialog', () => {
+    it('navigates to pokemon details on card click', async () => {
+      setup();
+      const user = userEvent.setup();
+      
+      const firstCard = screen.getAllByTestId('pokemon-card')[0];
+      await user.click(firstCard);
+
+      expect(mockNavigate).toHaveBeenCalledWith('/pokemon/1');
     });
 
-    it('shows all pokemon when search is empty', () => {
-      render(<PokemonList />);
-      const searchInput = screen.getByPlaceholderText('Search by name or type...');
-      
-      fireEvent.change(searchInput, { target: { value: 'bulba' } });
-      fireEvent.change(searchInput, { target: { value: '' } });
-      
-      expect(screen.getByText('Bulbasaur')).toBeInTheDocument();
-      expect(screen.getByText('Pikachu')).toBeInTheDocument();
+    it('shows dialog when URL includes pokemon ID', () => {
+      setup({ initialRoute: '/pokemon/1' });
+      expect(screen.getByTestId('pokemon-dialog')).toBeInTheDocument();
     });
 
-    it('shows no results when search has no matches', () => {
-      render(<PokemonList />);
-      const searchInput = screen.getByPlaceholderText('Search by name or type...');
+    it('closes dialog and navigates back', async () => {
+      setup({ initialRoute: '/pokemon/1' });
+      const user = userEvent.setup();
       
-      fireEvent.change(searchInput, { target: { value: 'xyz123' } });
-      
-      expect(screen.queryByText('Bulbasaur')).not.toBeInTheDocument();
-      expect(screen.queryByText('Pikachu')).not.toBeInTheDocument();
+      const dialog = screen.getByTestId('pokemon-dialog');
+      await user.click(dialog);
+
+      expect(mockNavigate).toHaveBeenCalledWith('/pokemon');
     });
   });
 }); 

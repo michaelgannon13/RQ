@@ -27,6 +27,7 @@ export const PokemonCard = memo<PokemonCardProps>(({
 
   return (
     <div 
+      data-testid="pokemon-card"
       className={classes.card}
       onClick={handleClick}
       onKeyPress={handleKeyPress}

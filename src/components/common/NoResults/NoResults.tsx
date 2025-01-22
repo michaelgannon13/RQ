@@ -9,7 +9,7 @@ export const NoResults: React.FC<NoResultsProps> = ({ searchTerm }) => {
   const classes = useStyles();
   
   return (
-    <div className={classes.noResults}>
+    <div className={classes.noResults} data-testid="no-results">
       <img 
         src="https://static1.srcdn.com/wordpress/wp-content/uploads/2022/09/Sad-Pikachu.jpg?q=50&fit=crop&w=1140&h=&dpr=1.5" 
         alt="Sad Pikachu"

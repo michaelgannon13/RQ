@@ -24,6 +24,7 @@ export const Select: React.FC<SelectProps> = ({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       className={classes.select}
+      data-testid="sort-select"
     >
       {options.map(option => (
         <option key={option.value} value={option.value}>
