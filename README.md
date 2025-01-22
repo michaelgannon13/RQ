@@ -21,7 +21,6 @@ A modern web application built with React and GraphQL that allows users to brows
 - Keyboard accessibility and screen reader support
 - Error handling with user-friendly messages
 - Loading states with custom Pokéball spinner
-- Infinite scroll with simulated loading
 
 ## Tech Stack
 

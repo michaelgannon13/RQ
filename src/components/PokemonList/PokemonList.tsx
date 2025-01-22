@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetPokemons } from '../../hooks/useGetPokemons';
@@ -23,43 +23,8 @@ export const PokemonList = () => {
   const { pokemons, loading } = useGetPokemons();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('number');
-  const [visibleItems, setVisibleItems] = useState(20);
-  const loaderRef = useRef(null);
 
   const filteredAndSortedPokemons = usePokemonFiltering(pokemons, searchTerm, sortBy);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const first = entries[0];
-        if (first.isIntersecting && visibleItems < filteredAndSortedPokemons.length) {
-          setTimeout(() => {
-            setVisibleItems(prev => Math.min(prev + 20, filteredAndSortedPokemons.length));
-          }, 300); // Simulate loading delay
-        }
-      },
-      { 
-        root: null,
-        rootMargin: '100px',
-        threshold: 0.1 
-      }
-    );
-
-    const currentRef = loaderRef.current;
-    if (currentRef) {
-      observer.observe(currentRef);
-    }
-
-    return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef);
-      }
-    };
-  }, [visibleItems, filteredAndSortedPokemons.length]);
-
-  useEffect(() => {
-    setVisibleItems(20);
-  }, [searchTerm, sortBy]);
 
   const handlePokemonClick = (pokemonId: string) => {
     navigate(`/pokemon/${pokemonId}`);
@@ -72,54 +37,34 @@ export const PokemonList = () => {
   if (loading) return <Spinner />;
 
   return (
-    <div className={classes.container}>
-      <div className={classes.root}>
-        <SearchBar
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          sortOptions={SORT_OPTIONS}
-        />
-        
-        <PokemonGrid 
-          pokemons={filteredAndSortedPokemons.slice(0, visibleItems)}
-          onPokemonClick={handlePokemonClick}
-          searchTerm={searchTerm}
-        />
+    <div className={classes.root}>
+      <SearchBar
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+        sortOptions={SORT_OPTIONS}
+      />
+      
+      <PokemonGrid 
+        pokemons={filteredAndSortedPokemons}
+        onPokemonClick={handlePokemonClick}
+        searchTerm={searchTerm}
+      />
 
-        {visibleItems < filteredAndSortedPokemons.length && (
-          <div ref={loaderRef} className={classes.loader}>
-            <Spinner />
-          </div>
-        )}
-
-        <PokemonDialog
-          pokemonNumber={id || null}
-          open={!!id}
-          onClose={handleCloseDialog}
-        />
-      </div>
+      <PokemonDialog
+        pokemonNumber={id || null}
+        open={!!id}
+        onClose={handleCloseDialog}
+      />
     </div>
   );
 };
 
 const useStyles = createUseStyles({
-  container: {
-    height: '100vh',
-    overflowY: 'auto',
-    position: 'relative',
-  },
   root: {
     width: '100%',
     padding: '32px',
     boxSizing: 'border-box',
-    minHeight: '101vh', // Ensure scrollbar appears
-  },
-  loader: {
-    display: 'flex',
-    justifyContent: 'center',
-    padding: '20px',
-    marginTop: '20px',
   },
 });
