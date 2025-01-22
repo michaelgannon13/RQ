@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createUseStyles } from 'react-jss';
-import ReactMarkdown from 'react-markdown';
 import README from '../README.md';
+import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
 
 export const Home = () => {
   const classes = useStyles();
@@ -17,7 +17,7 @@ export const Home = () => {
 
   return (
     <div className={classes.root}>
-      <ReactMarkdown>{markdown}</ReactMarkdown>
+      {/* <ReactMarkdown>{markdown}</ReactMarkdown> */}
     </div>
   );
 };
