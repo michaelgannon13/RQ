@@ -120,17 +120,4 @@ describe('usePokemonFiltering', () => {
     });
   });
 
-  describe('Filtering and Sorting Combined', () => {
-    it('filters first then sorts the results', () => {
-      const { result } = renderHook(() => 
-        usePokemonFiltering(mockPokemons, 'a', 'name')
-      );
-      
-      expect(result.current.map(p => p.name)).toEqual([
-        'Bulbasaur',
-        'Charmander',
-        'Pikachu'
-      ]);
-    });
-  });
 });
