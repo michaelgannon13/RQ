@@ -81,7 +81,7 @@ describe('PokemonGrid', () => {
     expect(gridElement).toHaveStyle({
       display: 'grid',
       gap: '24px',
-      padding: '16px'
+      padding: '24px'
     });
   });
 }); 
