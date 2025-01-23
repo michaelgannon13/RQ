@@ -69,7 +69,7 @@ describe('PokemonGrid', () => {
   });
 
   it('applies correct grid styling', () => {
-    const { container } = render(
+    render(
       <PokemonGrid 
         pokemons={mockPokemons}
         onPokemonClick={mockOnPokemonClick}
@@ -77,7 +77,7 @@ describe('PokemonGrid', () => {
       />
     );
 
-    const gridElement = container.firstChild;
+    const gridElement = screen.getByTestId('pokemon-grid');
     expect(gridElement).toHaveStyle({
       display: 'grid',
       gap: '24px',

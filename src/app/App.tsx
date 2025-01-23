@@ -15,17 +15,15 @@ function App() {
         <div className={classes.root}>
           <BrowserRouter>
             <Nav />
-            <div className={classes.content}>
-              <div className={classes.scrollableArea}>
-                <React.Suspense fallback={<Spinner />}>
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/pokemon" element={<ListPage />} />
-                    <Route path="/pokemon/:id" element={<ListPage />} />
-                  </Routes>
-                </React.Suspense>
-              </div>
-            </div>
+            <main className={classes.content}>
+              <React.Suspense fallback={<Spinner />}>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/pokemon" element={<ListPage />} />
+                  <Route path="/pokemon/:id" element={<ListPage />} />
+                </Routes>
+              </React.Suspense>
+            </main>
           </BrowserRouter>
         </div>
       </LayoutProvider>
@@ -33,31 +31,18 @@ function App() {
   );
 }
 
-const useStyles = createUseStyles(
-  {
-    root: {
-      background: '#171E2b',
-      minHeight: '100vh',
-      minWidth: '100vw',
-      height: '100%',
-      width: '100%',
-      display: 'flex',
-    },
-    content: {
-      flex: '1',
-      overflow: 'hidden',
-      position: 'relative',
-    },
-    scrollableArea: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      overflow: 'auto',
-    },
+const useStyles = createUseStyles({
+  root: {
+    background: '#171E2b',
+    minHeight: '100vh',
+    width: '100%',
+    display: 'flex',
   },
-  { name: 'App' }
-);
+  content: {
+    flex: 1,
+    overflow: 'auto',
+    padding: '20px',  // Added for better content spacing
+  }
+}, { name: 'App' });
 
 export default App;
