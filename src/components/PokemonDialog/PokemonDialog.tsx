@@ -61,6 +61,15 @@ export const PokemonDialog: React.FC<PokemonDialogProps> = ({
                   <div className={classes.stat}>
                     <span>Classification:</span> {pokemon.classification}
                   </div>
+                  <div className={classes.stat}>
+                    <span>Max CP:</span> {pokemon.maxCP}
+                  </div>
+                  <div className={classes.stat}>
+                    <span>Max HP:</span> {pokemon.maxHP}
+                  </div>
+                  <div className={classes.stat}>
+                    <span>Flee Rate:</span> {pokemon.fleeRate}
+                  </div>
                 </div>
                 <div className={classes.attributes}>
                   <div className={classes.attributeSection}>

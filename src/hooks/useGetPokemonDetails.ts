@@ -19,6 +19,9 @@ const GET_POKEMON_DETAILS = gql`
       types
       resistant
       weaknesses
+      fleeRate
+      maxCP
+      maxHP
       image
     }
   }

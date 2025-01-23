@@ -19,6 +19,9 @@ export interface PokemonDetails extends Pokemon {
   classification: string;
   resistant: string[];
   weaknesses: string[];
+  fleeRate: number;
+  maxCP: number;
+  maxHP: number;
 }
 
 export interface PokemonOption {
