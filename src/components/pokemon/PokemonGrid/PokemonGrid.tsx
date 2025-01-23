@@ -23,12 +23,17 @@ export const PokemonGrid = memo<PokemonGridProps>(({
 
   return (
     <div className={classes.grid}>
-      {pokemons.map((pokemon) => (
-        <PokemonCard
+      {pokemons.map((pokemon, index) => (
+        <div
           key={pokemon.id}
-          pokemon={pokemon}
-          onClick={onPokemonClick}
-        />
+          className={classes.gridItem}
+          style={{ animationDelay: `${index * 0.1}s` }}
+        >
+          <PokemonCard
+            pokemon={pokemon}
+            onClick={onPokemonClick}
+          />
+        </div>
       ))}
     </div>
   );
@@ -37,6 +42,16 @@ export const PokemonGrid = memo<PokemonGridProps>(({
 PokemonGrid.displayName = 'PokemonGrid';
 
 const useStyles = createUseStyles({
+  '@keyframes fadeIn': {
+    from: {
+      opacity: 0,
+      transform: 'translateY(10px)',
+    },
+    to: {
+      opacity: 1,
+      transform: 'translateY(0)',
+    },
+  },
   grid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
@@ -45,5 +60,9 @@ const useStyles = createUseStyles({
     '& > *': {
       justifySelf: 'center',
     },
+  },
+  gridItem: {
+    animation: '$fadeIn 0.1s ease-out forwards',
+    opacity: 0,
   },
 }, { name: 'PokemonGrid' }); 
