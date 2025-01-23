@@ -3,6 +3,7 @@ import { createUseStyles } from 'react-jss';
 import { useGetPokemonDetails } from '../../hooks/useGetPokemonDetails';
 import { PokemonDialogProps } from '../../types/components';
 import { getTypeColor } from '../../types/pokemon';
+import Spinner from '../Spinner/Spinner';
 
 export const PokemonDialog: React.FC<PokemonDialogProps> = ({
   pokemonNumber: pokemonId,
@@ -22,7 +23,7 @@ export const PokemonDialog: React.FC<PokemonDialogProps> = ({
     <div className={classes.overlay} onClick={onClose} data-testid="pokemon-dialog-overlay">
       <div className={classes.dialog} onClick={(e) => e.stopPropagation()} data-testid="pokemon-dialog-content">
         {loading ? (
-          <div className={classes.loading}>Loading...</div>
+          <Spinner size={80} />
         ) : pokemon ? (
           <>
             <button className={classes.closeButton} onClick={onClose}>
@@ -116,7 +117,7 @@ const useStyles = createUseStyles({
     zIndex: 1000,
   },
   dialog: {
-    backgroundColor: 'white',
+    backgroundColor: '#f5f5f5',
     borderRadius: '12px',
     padding: '24px',
     maxWidth: '600px',
@@ -186,11 +187,15 @@ const useStyles = createUseStyles({
     display: 'flex',
     flexDirection: 'column',
     gap: '8px',
+    color: '#333',
   },
   stat: {
+    color: '#333',
+    textAlign: 'center',
     '& span': {
       fontWeight: 'bold',
       marginRight: '8px',
+      color: '#333',
     },
   },
   attributes: {
@@ -198,6 +203,7 @@ const useStyles = createUseStyles({
     display: 'flex',
     flexDirection: 'column',
     gap: '16px',
+    color: '#333',
   },
   attributeSection: {
     '& h3': {

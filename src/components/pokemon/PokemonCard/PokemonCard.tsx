@@ -60,7 +60,7 @@ PokemonCard.displayName = 'PokemonCard';
 
 const useStyles = createUseStyles({
   card: {
-    background: 'white',
+    background: '#f5f5f5',
     borderRadius: '12px',
     padding: '16px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',

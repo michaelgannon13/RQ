@@ -7,4 +7,4 @@
 //       toHaveClass(className: string): R;
 //     }
 //   }
-// } 
+// }  

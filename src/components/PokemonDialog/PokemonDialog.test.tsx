@@ -34,7 +34,7 @@ describe('PokemonDialog', () => {
     mockUseGetPokemonDetails.mockReturnValue({ loading: true, pokemon: null });
     render(<PokemonDialog {...defaultProps} />);
     
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByTestId('spinner')).toBeInTheDocument();
   });
 
   it('should show error state when pokemon is not found', () => {
