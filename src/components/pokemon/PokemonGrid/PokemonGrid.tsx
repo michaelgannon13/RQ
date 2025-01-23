@@ -103,16 +103,18 @@ const useStyles = createUseStyles({
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, 282px)',
     gap: '24px',
-    padding: '16px',
-    '& > *': {
-      justifySelf: 'center',
-    },
+    padding: '24px',
+    width: '100%',
+    maxWidth: '1506px',
+    margin: '0 auto',
+    justifyContent: 'center',
   },
   gridItem: {
     animation: '$fadeIn 0.1s ease-out forwards',
     opacity: 0,
+    width: '282px',
   },
   pagination: {
     display: 'flex',
